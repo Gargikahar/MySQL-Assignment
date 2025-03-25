@@ -1,7 +1,18 @@
-Learn MySQL
-MySQL is a widely used relational database management system (RDBMS).
+create database university_db;
+Query OK, 1 row affected (0.11 sec)
 
-MySQL is free and open-source.
+mysql> use university_db;
+Database changed
 
-MySQL is ideal for both small and large applications.
+mysql> create table courses (course_id int primary key auto_increment, course_name varchar(50), course_credits decimal(10,2));
+Query OK, 0 rows affected (0.36 sec)
 
+mysql> desc courses;
++----------------+---------------+------+-----+---------+----------------+
+| Field          | Type          | Null | Key | Default | Extra          |
++----------------+---------------+------+-----+---------+----------------+
+| course_id      | int           | NO   | PRI | NULL    | auto_increment |
+| course_name    | varchar(50)   | YES  |     | NULL    |                |
+| course_credits | decimal(10,2) | YES  |     | NULL    |                |
++----------------+---------------+------+-----+---------+----------------+
+3 rows in set (0.01 sec)
