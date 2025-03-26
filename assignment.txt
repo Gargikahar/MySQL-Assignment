@@ -669,4 +669,341 @@ mysql> describe courses;
 +-----------------+-------------+------+-----+---------+----------------+
 3 rows in set (0.00 sec)
 
-mysql>
+6. DROP Command  
+ 
+Theory Questions: 
+ 
+1. What is the function of the DROP command in SQL? 
+Ans.
+DROP Command in SQL 
+The DROP command permanently deletes database objects like tables, databases, columns, and indexes. 
+
+
+Drop a Table:
+
+DROP TABLE students;
+
+Drop a Database:
+DROP DATABASE school;
+
+Drop a Column:
+ALTER TABLE students DROP COLUMN age;
+
+Drop an Index:
+DROP INDEX idx_student_name ON students;
+
+2. What are the implications of dropping a table from a database? 
+Ans.
+Implications of Dropping a Table in SQL
+1. Permanent Data Loss – All records in the table are permanently deleted.
+2. Cannot Be Undone – The action cannot be rolled back unless a backup exists.
+3. Removes Structure – The table schema (columns, constraints, indexes) is deleted.
+4. Breaks Relationships – If the table has FOREIGN KEY references, they may cause errors.
+5. Affects Queries & Applications – Any queries, views, or applications using the table will fail.
+ 
+LAB EXERCISES: 
+ 
+ Lab 1: Drop the teachers table from the school_db database. 
+Ans.
+mysql> use school_db;
+Database changed
+mysql> drop table teachers;
+Query OK, 0 rows affected (0.22 sec)
+
+ Lab 2: Drop the students table from the school_db database and verify that the table has 
+been removed.
+Ans.
+mysql> drop table teachers;
+Query OK, 0 rows affected (0.16 sec)
+
+mysql> show tables;
+Empty set (0.22 sec)
+
+7. Data Manipulation Language (DML)  
+ 
+Theory Questions: 
+ 
+1. Define the INSERT, UPDATE, and DELETE commands in SQL.
+Ans.
+INSERT, UPDATE, and DELETE Commands in SQL
+These three Data Manipulation Language (DML) commands are used to modify data in a database.
+
+1.INSERT Command (Add New Data)
+The INSERT command is used to add new records into a table.
+
+Syntax:
+
+INSERT INTO table_name (column1, column2, ...) 
+VALUES (value1, value2, ...);
+Example:
+
+INSERT INTO students (student_id, name, age) 
+VALUES (1, 'Alice', 20);
+* Adds a new student to the students table.
+
+2. UPDATE Command (Modify Existing Data)
+The UPDATE command modifies existing records in a table.
+
+Syntax:
+
+UPDATE table_name 
+SET column1 = value1, column2 = value2 
+WHERE condition;
+
+Example:
+
+UPDATE students 
+SET age = 21 
+WHERE student_id = 1;
+* Updates Alice’s age to 21.
+
+3. DELETE Command (Remove Data)
+The DELETE command removes records from a table.
+
+Syntax:
+
+DELETE FROM table_name WHERE condition;
+
+Example:
+
+DELETE FROM students WHERE student_id = 1;
+* Deletes Alice’s record.
+
+Without WHERE, all records will be deleted!
+
+Key Differences
+
+Command	        Purpose	              Affects	
+INSERT	    Adds new data             New rows	
+UPDATE	    Modifies existing data	  Specific rows	
+DELETE	    Removes data	          Specific rows	
+
+
+2. What is the importance of the WHERE clause in UPDATE and DELETE operations? 
+Importance of the WHERE Clause in UPDATE and DELETE Operations
+The WHERE clause is critical in UPDATE and DELETE commands because it specifies which records should be modified or removed. 
+Without it, all rows in the table will be affected! 
+Prevents modifying or deleting all records accidentally.
+Targets specific rows instead of affecting the entire table.
+
+Example (Safe UPDATE with WHERE)
+
+UPDATE students SET age = 22 WHERE student_id = 1;
+Without WHERE → Updates all students' ages!
+
+Example (Safe DELETE with WHERE)
+
+DELETE FROM students WHERE student_id = 1;
+Without WHERE → Deletes all students!
+
+
+LAB EXERCISES: 
+ 
+ Lab 1: Insert three records into the courses table using the INSERT command. 
+mysql> insert into courses (course_id,course_name,course_duration)Values
+    -> (1001,"PHP","4 Months"),
+    -> (1002,"Java","6 Months"),
+    -> (1003,"Data Analyst","8 Months");
+Query OK, 3 rows affected (0.12 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> select * from courses;
++-----------+--------------+-----------------+
+| course_id | course_name  | course_duration |
++-----------+--------------+-----------------+
+|      1001 | PHP          | 4 Months        |
+|      1002 | Java         | 6 Months        |
+|      1003 | Data Analyst | 8 Months        |
++-----------+--------------+-----------------+
+3 rows in set (0.00 sec)
+
+ Lab 2: Update the course duration of a specific course using the UPDATE command. 
+Ans.
+mysql> update courses set course_duration = "7 Months" where course_name="java";
+Query OK, 1 row affected (0.09 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from courses;
++-----------+--------------+-----------------+
+| course_id | course_name  | course_duration |
++-----------+--------------+-----------------+
+|      1001 | PHP          | 4 Months        |
+|      1002 | java         | 7 Months        |
+|      1003 | Data Analyst | 8 Months        |
++-----------+--------------+-----------------+
+3 rows in set (0.00 sec)
+
+ Lab 3: Delete a course with a specific course_id from the courses table using the DELETE 
+command. 
+Ans.
+mysql> delete from courses where course_id=1003;
+Query OK, 1 row affected (0.13 sec)
+
+mysql> select * from courses;
++-----------+-------------+-----------------+
+| course_id | course_name | course_duration |
++-----------+-------------+-----------------+
+|      1001 | PHP         | 4 Months        |
+|      1002 | java        | 7 Months        |
++-----------+-------------+-----------------+
+2 rows in set (0.00 sec)
+
+8. Data Query Language (DQL)  
+ 
+Theory Questions: 
+ 
+1. What is the SELECT statement, and how is it used to query data? 
+Ans.
+SELECT Statement in SQL
+The SELECT statement is used to retrieve data from one or more tables in a database. It allows filtering, 
+sorting, and grouping of data based on specific conditions.
+
+Basic Syntax:
+SELECT column1, column2 FROM table_name;
+
+Select All Columns:
+SELECT * FROM courses;
+
+Filter with WHERE:
+SELECT * FROM courses WHERE course_duration = '6 Months';
+
+Sort with ORDER BY:
+SELECT * FROM courses ORDER BY course_name ASC;
+
+Limit Results:
+SELECT * FROM courses LIMIT 5;
+
+2. Explain the use of the ORDER BY and WHERE clauses in SQL queries. 
+Ans.
+ORDER BY and WHERE Clauses in SQL
+Both ORDER BY and WHERE are used to refine query results:
+
+WHERE → Filters rows before retrieval.
+ORDER BY → Sorts the final result set.
+
+Example (WHERE + ORDER BY)
+SELECT * FROM students WHERE age > 18 ORDER BY name ASC;
+ 
+LAB EXERCISES: 
+ 
+ Lab 1: Retrieve all courses from the courses table using the SELECT statement. 
+Ans.
+mysql> select * from courses;
++-----------+--------------+-----------------+
+| course_id | course_name  | course_duration |
++-----------+--------------+-----------------+
+|      1001 | PHP          | 4 Months        |
+|      1002 | java         | 7 Months        |
+|      1003 | Data Analyst | 8 Months        |
++-----------+--------------+-----------------+
+3 rows in set (0.00 sec)
+
+ Lab 2: Sort the courses based on course_duration in descending order using ORDER BY.
+Ans.
+mysql> select * from courses where course_duration order by course_duration desc;
++-----------+-------------+-----------------+
+| course_id | course_name | course_duration |
++-----------+-------------+-----------------+
+|      1002 | java        | 7 Months        |
+|      1001 | PHP         | 4 Months        |
++-----------+-------------+-----------------+
+2 rows in set, 2 warnings (0.10 sec)
+
+ Lab 3: Limit the results of the SELECT query to show only the top two courses using LIMIT.
+Ans.
+mysql> select * from courses order by course_id limit 2;
++-----------+-------------+-----------------+
+| course_id | course_name | course_duration |
++-----------+-------------+-----------------+
+|      1001 | PHP         | 4 Months        |
+|      1002 | java        | 7 Months        |
++-----------+-------------+-----------------+
+2 rows in set (0.00 sec)
+
+9. Data Control Language (DCL)  
+ 
+Theory Questions: 
+ 
+1. What is the purpose of GRANT and REVOKE in SQL? 
+Ans.
+Data Controlling Language (DCL) helps users to retrieve and modify the data stored in the database with some specified queries. Grant 
+and Revoke belong to these types of commands of the Data controlling Language. DCL is a component of SQL commands. 
+
+1. Grant : 
+SQL Grant command is specifically used to provide privileges to database objects for a user. 
+This command also allows users to grant permissions to other users too. 
+
+Syntax: 
+grant privilege_name on object_name
+to {user_name | public | role_name} 
+Here privilege_name is which permission has to be granted, object_name is the name of the database object, 
+user_name is the user to which access should be provided, the public is used to permit access to all the users. 
+
+2. Revoke : 
+Revoke command withdraw user privileges on database objects if any granted. It does operations opposite to the Grant command.
+When a privilege is revoked from a particular user U, then the privileges granted to all other users by user U will be revoked. 
+
+Syntax: 
+revoke privilege_name on object_name
+from {user_name | public | role_name}
+Example:  
+
+2. How do you manage privileges using these commands? 
+Ans.
+Managing user access and privileges is a crucial aspect of database administration in MySQL. 
+After creating a user account with the CREATE USER statement, the next step is to define what that user can do within the database.
+
+This is achieved through the GRANT statement, which allows administrators to assign specific privileges to users 
+and ensure they can perform only the actions necessary for their roles.
+Also, if a user’s access needs to be restricted, the REVOKE statement can remove previously granted privileges. 
+
+LAB EXERCISES: 
+ 
+ Lab 1: Create two new users user1 and user2 and grant user1 permission to SELECT 
+from the courses table. 
+ CREATE USER 'user1'@'localhost' IDENTIFIED BY 'password1';
+Query OK, 0 rows affected (0.47 sec)
+
+mysql> CREATE USER 'user2'@'localhost' IDENTIFIED BY 'password2';
+Query OK, 0 rows affected (0.17 sec)
+
+GRANT SELECT ON university_db.courses TO 'user1'@'localhost';
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.08 sec)
+
+ SHOW GRANTS FOR 'user1'@'localhost';
++------------------------------------------------------------------+
+| Grants for user1@localhost                                       |
++------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `user1`@`localhost`                        |
+| GRANT SELECT ON `university_db`.`courses` TO `user1`@`localhost` |
++------------------------------------------------------------------+
+2 rows in set (0.06 sec)
+
+ Lab 2: Revoke the INSERT permission from user1 and give it to user2.
+Ans.
+REVOKE INSERT ON university_db.courses FROM 'user1'@'localhost';
+Query OK, 0 rows affected (0.11 sec)
+
+mysql> GRANT INSERT ON university_db.courses TO 'user2'@'localhost';
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> SHOW GRANTS FOR 'user1'@'localhost';
++------------------------------------------------------------------+
+| Grants for user1@localhost                                       |
++------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `user1`@`localhost`                        |
+| GRANT SELECT ON `university_db`.`courses` TO `user1`@`localhost` |
++------------------------------------------------------------------+
+2 rows in set (0.00 sec)
+
+mysql> SHOW GRANTS FOR 'user2'@'localhost';
++------------------------------------------------------------------+
+| Grants for user2@localhost                                       |
++------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `user2`@`localhost`                        |
+| GRANT INSERT ON `university_db`.`courses` TO `user2`@`localhost` |
++------------------------------------------------------------------+
+2 rows in set (0.00 sec)
