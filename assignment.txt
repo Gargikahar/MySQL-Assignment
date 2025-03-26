@@ -1007,3 +1007,139 @@ mysql> SHOW GRANTS FOR 'user2'@'localhost';
 | GRANT INSERT ON `university_db`.`courses` TO `user2`@`localhost` |
 +------------------------------------------------------------------+
 2 rows in set (0.00 sec)
+
+10. Transaction Control Language (TCL)  
+ 
+Theory Questions: 
+ 
+1. What is the purpose of the COMMIT and ROLLBACK commands in SQL?
+Ans.n SQL, transaction control is essential for managing changes in a database effectively. 
+COMMIT and ROLLBACK are two crucial Transaction Control Language (TCL) commands that help maintain data integrity and consistency. 
+While COMMIT ensures that all changes in a transaction are permanently saved, ROLLBACK provides a mechanism to undo changes when something goes wrong.
+
+Understanding the differences between these commands is critical for database administrators, 
+developers, and anyone working with transactional data to ensure reliable and error-free database operations. 
+Proper usage of these commands ensures reliable and error-free database operations while maintaining data stability.
+
+COMMIT
+1. Function - Permanently saves changes made by the current transaction.
+2. Undo Capability - Cannot undo changes after execution.
+3. When Applied - Used when the transaction is successfully completed.
+4. Data Integrity - Ensures that changes are saved permanently.
+5. Syntax - COMMIT;
+6. Error Handling - No changes are rolled back even if errors occur after the COMMIT statement.
+
+ROLLBACK
+1. Function - Undoes changes made by the current transaction.
+2. Undo Capability - Reverts the database to its previous state before the transaction.
+3. When Applied - Used when the transaction fails, is incorrect, or aborted.
+4. Data Integrity - Ensures that errors do not affect the database by undoing partial changes.
+5. Syntax - ROLLBACK;
+6. Error Handling - Automatically undoes uncommitted changes in case of errors or failures.
+
+
+2. Explain how transactions are managed in SQL databases. 
+Managing Transactions in SQL Databases
+A transaction in SQL is a group of one or more SQL statements executed as a single unit of work. Transactions ensure data integrity and consistency, especially in scenarios involving multiple changes to the database.
+Transaction Lifecycle
+Transactions follow a lifecycle with four main stages:
+BEGIN (Start Transaction) – The transaction starts.
+DML Operations – Perform database changes (INSERT, UPDATE, DELETE).
+COMMIT or ROLLBACK
+COMMIT: Saves all changes permanently.
+ROLLBACK: Undoes all changes made during the transaction.
+END – The transaction is complete.
+
+A transaction in SQL is a sequence of one or more SQL statements executed as a single unit of work. 
+These statements could be performing operations like INSERT, UPDATE, or DELETE. The main idea behind a transaction is that all changes made within it should either be completely successful or fully undone in case of failure. In the case of an error, a rollback ensures that no partial changes are saved.
+
+The SQL transaction must adhere to four key properties known as ACID:
+
+Atomicity: The outcome of a transaction can either be completely successful or completely unsuccessful. 
+The whole transaction must be rolled back if one part of it fails.
+Consistency: Transactions maintain integrity restrictions by moving the database from one valid state to another.
+Isolation: Concurrent transactions are isolated from one another, assuring the accuracy of the data.
+Durability: Once a transaction is committed, its modifications remain in effect even in the event of a system failure.
+ 
+LAB EXERCISES: 
+ 
+ Lab 1: Insert a few rows into the courses table and use COMMIT to save the changes. 
+Ans.
+ start transaction;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> insert into courses(course_id,course_name,course_duration) values(1006,'Paython','5 Months'),(1007,'Artificial Intelligence','8 Months');
+Query OK, 2 rows affected (0.00 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> commit;
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> SELECT * FROM courses;
++-----------+-------------------------+-----------------+
+| course_id | course_name             | course_duration |
++-----------+-------------------------+-----------------+
+|      1001 | PHP                     | 4 Months        |
+|      1002 | java                    | 7 Months        |
+|      1003 | Data Analyst            | 8 Months        |
+|      1004 | Full Stack              | 12 Months       |
+|      1005 | Javascript              | 3 Months        |
+|      1006 | Paython                 | 5 Months        |
+|      1007 | Artificial Intelligence | 8 Months        |
++-----------+-------------------------+-----------------+
+7 rows in set (0.00 sec)
+
+ Lab 2: Insert additional rows, then use ROLLBACK to undo the last insert operation. 
+Ans.
+ start transaction;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> insert into courses(course_id,course_name,course_duration) values(1008,'Data Science','3 Months');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> rollback;
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> SELECT * FROM courses;
++-----------+-------------------------+-----------------+
+| course_id | course_name             | course_duration |
++-----------+-------------------------+-----------------+
+|      1001 | PHP                     | 4 Months        |
+|      1002 | java                    | 7 Months        |
+|      1003 | Data Analyst            | 8 Months        |
+|      1004 | Full Stack              | 12 Months       |
+|      1005 | Javascript              | 3 Months        |
+|      1006 | Paython                 | 5 Months        |
+|      1007 | Artificial Intelligence | 8 Months        |
++-----------+-------------------------+-----------------+
+7 rows in set (0.00 sec)
+
+ Lab 3: Create a SAVEPOINT before updating the courses table, and use it to roll back 
+specific changes.
+Ans.
+mysql> start transaction;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> insert into courses(course_id,course_name,course_duration) values(1008,'Data Science','3 Months');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> savepoint before_update;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> update courses set course_duration ='6 Months' where course_id=1008;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> ROLLBACK TO before_update;
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> commit;
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> SELECT * FROM courses WHERE course_id = 1008;
++-----------+--------------+-----------------+
+| course_id | course_name  | course_duration |
++-----------+--------------+-----------------+
+|      1008 | Data Science | 3 Months        |
++-----------+--------------+-----------------+
+1 row in set (0.00 sec)
