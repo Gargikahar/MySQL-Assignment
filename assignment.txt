@@ -290,17 +290,290 @@ mysql> select * from students where age > 10;
 3 rows in set (0.05 sec)
 
 mysql>
+3. SQL Constraints  
+ 
+Theory Questions: 
+ 
+1. What are constraints in SQL? List and explain the different types of constraints. 
+In SQL, constraints are rules enforced on columns in a table to maintain data integrity and accuracy. Constraints help prevent invalid data entry and ensure the consistency of data within the database.
 
-create database university_db;
-Query OK, 1 row affected (0.11 sec)
+Types of Constraints in SQL
+There are several types of constraints in SQL:
 
+NOT NULL
+Ensures that a column cannot have NULL values.
+Used when a field must always have a value.
+
+UNIQUE
+Ensures that all values in a column are distinct.
+Allows NULL values unless explicitly defined otherwise.
+
+PRIMARY KEY
+Uniquely identifies each record in a table.
+Combines NOT NULL and UNIQUE constraints.
+A table can have only one primary key.
+
+FOREIGN KEY
+Establishes a relationship between two tables.
+Ensures that the value in a column exists in another table’s primary key column.
+
+CHECK
+Ensures that all values in a column meet a specific condition.
+
+DEFAULT
+Assigns a default value to a column if no value is provided.
+
+INDEX (Not a constraint but helps in performance)
+Improves retrieval speed for queries on specific columns.
+
+2. How do PRIMARY KEY and FOREIGN KEY constraints differ? 
+Ans.
+PRIMARY KEY:
+1. Definition - Uniquely identifies each record in a table.
+2. Uniqueness - Must have unique values for each row.
+3. NULL Values - Cannot contain NULL values.
+4. Number per Table - Only one PRIMARY KEY per table.
+5. Reference - Defined within the same table.
+6. Data Integrity - Ensures unique identification of each record in a table.
+7. Example,
+   CREATE TABLE Students ( Student_ID INT PRIMARY KEY, Student_Name VARCHAR(50) );
+
+FOREIGN KEY:
+1. Definition - Establishes a relationship between two tables by referencing the PRIMARY KEY of another table.
+2. Uniqueness - Can have duplicate values.
+3. NULL Values - Can contain NULL values (if not explicitly set as NOT NULL).
+4. Number per Table - A table can have multiple FOREIGN KEYS.
+5. Reference - References a PRIMARY KEY from another table.
+6. Data Integrity - Ensures referential integrity by preventing invalid data entry.
+7. Example,
+   CREATE TABLE Enrollments ( Enrollment_ID INT PRIMARY KEY, Student_ID INT, FOREIGN KEY (Student_ID) REFERENCES Students(Student_ID) );
+
+3. What is the role of NOT NULL and UNIQUE constraints? 
+Ans.
+Role of NOT NULL and UNIQUE Constraints in SQL
+1. NOT NULL Constraint
+Ensures that a column cannot have NULL values.
+Used when a field must always contain data.
+Helps maintain data completeness and prevents missing values.
+
+Example:
+
+CREATE TABLE Employees (
+    Employee_ID INT NOT NULL,
+    Name VARCHAR(50) NOT NULL,
+    Age INT
+);
+In this table:
+Employee_ID and Name must have values.
+Age can be NULL.
+
+2. UNIQUE Constraint
+Ensures that all values in a column are distinct.
+Allows NULL values (except in databases where NULL is considered a duplicate).
+Helps prevent duplicate entries in a specific column.
+
+Example:
+
+CREATE TABLE Customers (
+    Customer_ID INT PRIMARY KEY,
+    Email VARCHAR(100) UNIQUE
+);
+In this table:
+
+Customer_ID (PRIMARY KEY) must be unique and cannot be NULL.
+Email must be unique but can be NULL.
+
+ 
+LAB EXERCISES: 
+ 
+ Lab 1: Create a table teachers with the following columns: teacher_id (Primary Key), 
+teacher_name (NOT NULL), subject (NOT NULL), and email (UNIQUE).
+Ans:
+
+mysql> create table teachers(teacher_id int primary key auto_increment, teacher_name varchar(50) NOT NULL,subject varchar(50) NOT NULL,email varchar(50) UNIQUE);
+Query OK, 0 rows affected (0.98 sec)
+
+mysql> describe teachers;
++--------------+-------------+------+-----+---------+----------------+
+| Field        | Type        | Null | Key | Default | Extra          |
++--------------+-------------+------+-----+---------+----------------+
+| teacher_id   | int         | NO   | PRI | NULL    | auto_increment |
+| teacher_name | varchar(50) | NO   |     | NULL    |                |
+| subject      | varchar(50) | NO   |     | NULL    |                |
+| email        | varchar(50) | YES  | UNI | NULL    |                |
++--------------+-------------+------+-----+---------+----------------+
+4 rows in set (0.01 sec)
+
+ Lab 2: Implement a FOREIGN KEY constraint to relate the teacher_id from the 
+teachers table with the students table. 
+Ans:
+
+mysql> alter table students add column teacher_id int;
+Query OK, 0 rows affected (0.29 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table students add foreign key (teacher_id)  references teachers(teacher_id);
+Query OK, 5 rows affected (1.77 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> describe students;
++--------------+-------------+------+-----+---------+----------------+
+| Field        | Type        | Null | Key | Default | Extra          |
++--------------+-------------+------+-----+---------+----------------+
+| student_id   | int         | NO   | PRI | NULL    | auto_increment |
+| student_name | varchar(50) | YES  |     | NULL    |                |
+| age          | int         | YES  |     | NULL    |                |
+| class        | varchar(50) | YES  |     | NULL    |                |
+| address      | varchar(50) | YES  |     | NULL    |                |
+| teacher_id   | int         | YES  | MUL | NULL    |                |
++--------------+-------------+------+-----+---------+----------------+
+6 rows in set (0.00 sec)
+
+4. Main SQL Commands and Sub-commands (DDL)  
+ 
+Theory Questions: 
+ 
+1. Define the SQL Data Definition Language (DDL). 
+Ans.
+Data Definition Language (DDL) is a subset of SQL used to define, modify, and manage database schema structures, 
+such as tables, indexes, and constraints. DDL commands do not manipulate data but instead focus on the structure of the database.
+
+Key DDL Commands
+CREATE – Creates new database objects like tables, views, and indexes.
+
+        CREATE TABLE students (student_id INT PRIMARY KEY,name VARCHAR(100) NOT NULL,age INT);
+
+ALTER – Modifies existing database structures (e.g., adding or removing columns).
+
+        ALTER TABLE students ADD COLUMN grade VARCHAR(10);
+
+DROP – Deletes database objects permanently (tables, views, indexes, etc.).
+
+        DROP TABLE students;
+
+TRUNCATE – Removes all records from a table without deleting the table structure.
+
+        TRUNCATE TABLE students;
+
+RENAME – Changes the name of an existing database object.
+
+        ALTER TABLE students RENAME TO learners;
+
+Key Characteristics of DDL
+Defines database schema (tables, columns, constraints, etc.).
+Automatically commits changes (DDL commands cannot be rolled back).
+Does not manipulate data, only modifies the database structure.
+
+2. Explain the CREATE command and its syntax. 
+Ans:
+CREATE Command in SQL
+The CREATE command in SQL is part of Data Definition Language (DDL) 
+and is used to create database objects such as tables, views, indexes, and databases.
+
+1. Creating a Database
+To create a new database:
+Example,
+CREATE DATABASE school;
+This command creates a database named school.
+
+You must have the necessary permissions to create a database.
+
+2. Creating a Table
+The CREATE TABLE statement defines a new table with columns and their data types.
+
+Syntax:
+
+CREATE TABLE table_name (
+    column1 datatype constraints,
+    column2 datatype constraints,
+    ...
+);
+
+Example:
+
+CREATE TABLE students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    age INT CHECK (age > 0),
+    email VARCHAR(100) UNIQUE
+);
+Explanation:
+
+student_id INT PRIMARY KEY → Defines student_id as the primary key.
+name VARCHAR(100) NOT NULL → Ensures name cannot be NULL.
+age INT CHECK (age > 0) → Ensures age is greater than 0.
+email VARCHAR(100) UNIQUE → Ensures unique email values.
+
+3. Creating an Index
+Indexes improve query performance.
+
+CREATE INDEX idx_student_name ON students(name);
+This creates an index on the name column to speed up searches.
+
+4. Creating a View
+A view is a virtual table based on a query.
+
+CREATE VIEW student_view AS 
+SELECT student_id, name FROM students;
+This creates a view student_view that shows only student_id and name from the students table.
+
+Key Points About CREATE Command
+Defines the structure of database objects.
+Once created, objects can be modified using the ALTER command.
+Can be combined with constraints (NOT NULL, PRIMARY KEY, FOREIGN KEY, etc.).
+
+3. What is the purpose of specifying data types and constraints during table creation? 
+Ans.
+Purpose of Specifying Data Types and Constraints During Table Creation
+When creating a table in SQL, specifying data types and constraints is essential to ensure data integrity, 
+accuracy, and efficiency in database operations.
+
+1. Purpose of Data Types
+A data type defines the kind of values a column can store. This helps in:
+
+1. Data Integrity – Prevents invalid data entry (e.g., storing text in a numeric column).
+2. Optimized Storage – Saves memory by using appropriate data types (e.g., INT vs. BIGINT).
+3. Faster Processing – Enables efficient indexing and searching based on data types.
+
+Example of Data Types:
+
+INT - Integer ID
+VARCHAR(100) - Text with max 100 characters
+DECIMAL(10,2)- Numeric value with 2 decimal places
+DATE - Date format (YYYY-MM-DD) 
+and many more...
+
+2. Purpose of Constraints
+Constraints enforce rules on data to maintain accuracy, consistency, and reliability.
+
+1. Prevents Duplicate Data – PRIMARY KEY, UNIQUE
+2. Ensures Mandatory Values – NOT NULL
+3. Maintains Data Relationships – FOREIGN KEY
+3. Applies Business Rules – CHECK, DEFAULT
+
+Example of Constraints:
+
+CREATE TABLE students (
+    student_id INT PRIMARY KEY,        -- Unique ID for each student
+    name VARCHAR(100) NOT NULL,        -- Name cannot be NULL
+    age INT CHECK (age > 0),           -- Age must be greater than 0
+    email VARCHAR(100) UNIQUE,         -- No duplicate emails allowed
+    class_id INT,                      
+    FOREIGN KEY (class_id) REFERENCES classes(class_id)  -- Relationship with another table
+);
+
+LAB EXERCISES: 
+ 
+ Lab 1: Create a table courses with columns: course_id, course_name, and 
+course_credits. Set the course_id as the primary key. 
+Ans:
 mysql> use university_db;
 Database changed
 
 mysql> create table courses (course_id int primary key auto_increment, course_name varchar(50), course_credits decimal(10,2));
 Query OK, 0 rows affected (0.36 sec)
 
-mysql> desc courses;
+mysql> describe courses;
 +----------------+---------------+------+-----+---------+----------------+
 | Field          | Type          | Null | Key | Default | Extra          |
 +----------------+---------------+------+-----+---------+----------------+
@@ -309,3 +582,91 @@ mysql> desc courses;
 | course_credits | decimal(10,2) | YES  |     | NULL    |                |
 +----------------+---------------+------+-----+---------+----------------+
 3 rows in set (0.01 sec)
+
+ Lab 2: Use the CREATE command to create a database university_db.
+Ans:
+create database university_db;
+Query OK, 1 row affected (0.11 sec)
+
+5. ALTER Command  
+ 
+Theory Questions: 
+ 
+1. What is the use of the ALTER command in SQL? 
+Ans. ALTER Command in SQL
+The ALTER command is a Data Definition Language (DDL) statement used to modify an existing database structure without deleting or recreating it. It allows you to add, modify, or remove columns, constraints, and indexes in a table.
+
+Uses of the ALTER Command
+The ALTER command is primarily used for:
+
+* Adding new columns
+* Modifying column data types
+* Renaming columns or tables
+* Adding or removing constraints
+* Dropping columns
+
+Operation	                            SQL Syntax
+Add Column      -   ALTER TABLE table_name ADD COLUMN column_name datatype;
+Modify Column   -   ALTER TABLE table_name MODIFY COLUMN column_name new_datatype;
+Rename Column   -   ALTER TABLE table_name RENAME COLUMN old_name TO new_name;
+Rename Table    -   ALTER TABLE old_table_name RENAME TO new_table_name;
+Add Constraint  -   ALTER TABLE table_name ADD CONSTRAINT constraint_name CONSTRAINT_TYPE(column_name);
+Drop Column     -   ALTER TABLE table_name DROP COLUMN column_name;
+Drop Constraint -	ALTER TABLE table_name DROP CONSTRAINT constraint_name;
+
+2. How can you add, modify, and drop columns from a table using ALTER? 
+Ans.
+Using ALTER TABLE to Modify Columns in SQL
+
+Add a Column:
+ALTER TABLE employees ADD COLUMN department VARCHAR(50);
+
+Modify a Column:
+ALTER TABLE employees MODIFY COLUMN department TEXT NOT NULL;  -- MySQL  
+ALTER TABLE employees ALTER COLUMN department TYPE TEXT;  -- PostgreSQL, SQL Server
+
+Drop a Column:
+ALTER TABLE employees DROP COLUMN department;
+
+
+ADD COLUMN → Adds a new column.
+MODIFY COLUMN / ALTER COLUMN → Changes data type or constraints.
+DROP COLUMN → Removes a column from the table.
+
+LAB EXERCISES: 
+ 
+ Lab 1: Modify the courses table by adding a column course_duration using the ALTER 
+command. 
+Ans.
+mysql> alter table courses add column course_duration varchar(50);
+Query OK, 0 rows affected (0.92 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> describe courses;
++-----------------+---------------+------+-----+---------+----------------+
+| Field           | Type          | Null | Key | Default | Extra          |
++-----------------+---------------+------+-----+---------+----------------+
+| course_id       | int           | NO   | PRI | NULL    | auto_increment |
+| course_name     | varchar(50)   | YES  |     | NULL    |                |
+| course_credits  | decimal(10,2) | YES  |     | NULL    |                |
+| course_duration | varchar(50)   | YES  |     | NULL    |                |
++-----------------+---------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+ Lab 2: Drop the course_credits column from the courses table.
+Ans.
+mysql> alter table courses drop column course_credits;
+Query OK, 0 rows affected (0.86 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> describe courses;
++-----------------+-------------+------+-----+---------+----------------+
+| Field           | Type        | Null | Key | Default | Extra          |
++-----------------+-------------+------+-----+---------+----------------+
+| course_id       | int         | NO   | PRI | NULL    | auto_increment |
+| course_name     | varchar(50) | YES  |     | NULL    |                |
+| course_duration | varchar(50) | YES  |     | NULL    |                |
++-----------------+-------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql>
