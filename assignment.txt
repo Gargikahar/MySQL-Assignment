@@ -1143,3 +1143,1316 @@ mysql> SELECT * FROM courses WHERE course_id = 1008;
 |      1008 | Data Science | 3 Months        |
 +-----------+--------------+-----------------+
 1 row in set (0.00 sec)
+
+11. SQL Joins  
+ 
+Theory Questions: 
+ 
+1. Explain the concept of JOIN in SQL. What is the difference between INNER JOIN, LEFT 
+JOIN, RIGHT JOIN, and FULL OUTER JOIN? 
+Ans.
+In SQL, a JOIN is used to combine rows from two or more tables based on a related column between them. 
+This helps retrieve meaningful data from multiple tables in a relational database.
+Types of JOINs in SQL
+There are four primary types of JOIN operations in SQL:
+
+1. INNER JOIN
+Returns only the matching rows from both tables based on the given condition.
+If there is no match, the row is excluded from the result.
+Example:
+SELECT employees.name, departments.department_name
+FROM employees
+INNER JOIN departments ON employees.department_id = departments.id;
+Output: Returns only employees who are assigned to a department.
+
+2. LEFT JOIN (LEFT OUTER JOIN)
+Returns all rows from the left table and the matching rows from the right table.
+If there is no match in the right table, NULL values are returned.
+Example:
+SELECT employees.name, departments.department_name
+FROM employees
+LEFT JOIN departments ON employees.department_id = departments.id;
+Output: Returns all employees, including those who are not assigned to any department (with NULL in department_name).
+
+3. RIGHT JOIN (RIGHT OUTER JOIN)
+Returns all rows from the right table and the matching rows from the left table.
+If there is no match in the left table, NULL values are returned.
+Example:
+SELECT employees.name, departments.department_name
+FROM employees
+RIGHT JOIN departments ON employees.department_id = departments.id;
+Output: Returns all departments, including those that have no employees (with NULL in employee name).
+
+4. FULL OUTER JOIN
+Returns all rows when there is a match in either left or right table.
+If there is no match, NULLs are returned for the missing values from one of the tables.
+Example:
+SELECT employees.name, departments.department_name
+FROM employees
+FULL OUTER JOIN departments ON employees.department_id = departments.id;
+Output: Returns all employees and all departments. If an employee has no department, the department column is NULL, and vice versa.
+
+2. How are joins used to combine data from multiple tables? 
+Ans. SQL JOIN operations allow you to retrieve and merge data from multiple tables in a relational database based on a common key or relationship.
+ This is useful when data is normalized across different tables.
+ SQL joins are an essential part of relational database management, allowing users to combine data from multiple tables efficiently. 
+ When the required data is spread across different tables, joining these tables efficiently is necessary.
+
+ 
+LAB EXERCISES: 
+ 
+ Lab 1: Create two tables: departments and employees. Perform an INNER JOIN to 
+display employees along with their respective departments. 
+Ans
+create table departments(depart_id int primary key auto_increment, department_name varchar(50));
+Query OK, 0 rows affected (0.55 sec)
+
+insert into departments (depart_id,department_name) values(101,'HR'),(102,'Sales'),(103,'Marketing');
+Query OK, 3 rows affected (0.13 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> create table employees(emp_id int primary key auto_increment, employee_name varchar(50), salary decimal(10,2),depart_id int,
+foreign key(depart_id)references departments(depart_id) );
+Query OK, 0 rows affected (0.74 sec)
+
+insert into employees(emp_id,employee_name,salary,depart_id)values(201,'Ayansh',34000,101),(202,'Rahul',25000,103),(203,'Prachi',12000,102);
+Query OK, 3 rows affected (0.08 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> SELECT employees.emp_id, employees.employee_name, departments.department_name
+    -> FROM employees
+    -> INNER JOIN departments ON employees.depart_id = departments.depart_id;
++--------+---------------+-----------------+
+| emp_id | employee_name | department_name |
++--------+---------------+-----------------+
+|    201 | Ayansh        | HR              |
+|    202 | Rahul         | Marketing       |
+|    203 | Prachi        | Sales           |
++--------+---------------+-----------------+
+
+ Lab 2: Use a LEFT JOIN to show all departments, even those without employees.
+Ans.
+mysql> select departments.depart_id, departments.department_name,employees.emp_id, employees.employee_name
+    -> from departments
+    -> left join employees on departments.depart_id = employees.depart_id;
++-----------+-----------------+--------+---------------+
+| depart_id | department_name | emp_id | employee_name |
++-----------+-----------------+--------+---------------+
+|       101 | HR              |    201 | Ayansh        |
+|       102 | Sales           |    203 | Prachi        |
+|       103 | Marketing       |    202 | Rahul         |
+|       104 | Finance         |   NULL | NULL          |
++-----------+-----------------+--------+---------------+
+4 rows in set (0.00 sec)
+
+12. SQL Group By  
+ 
+Theory Questions: 
+ 
+1. What is the GROUP BY clause in SQL? How is it used with aggregate functions? 
+Ans.In SQL, grouping and aggregating data are essential techniques for analyzing datasets. When dealing with large volumes of data,
+ we often need to summarize or categorize it into meaningful groups. 
+ The combination of the GROUP BY clause and aggregate functions like COUNT(), SUM(), AVG(), MIN(), and MAX() 
+ makes it easy to perform such tasks.
+
+Grouping and Aggregating Data
+Grouping Data: The GROUP BY clause in SQL is used to arrange identical data into groups based on one or more columns. 
+Once data is grouped, aggregate functions can be used to summarize the information within those groups.
+
+Aggregating Data: Aggregate functions perform calculations on multiple rows of data and return a single result. 
+Common aggregate functions include COUNT(), SUM(), AVG(), MIN(), and MAX(). These help us get summaries like totals, averages, 
+and counts for different categories or groups
+
+Syntax:
+
+SELECT column1, column2, …, AGGREGATE_FUNCTION(column3)
+FROM table_name
+WHERE condition
+GROUP BY column1, column2, …
+HAVING condition
+ORDER BY column1;
+
+2. Explain the difference between GROUP BY and ORDER BY. 
+Ans.
+GROUP BY
+1. Group by statement is used to group the rows that have the same value.
+2. It may be allowed in CREATE VIEW statement.
+3. In select statements, it is always used before the order by keyword.
+4. An attribute cannot be in the group by a statement under the aggregate function.
+5. In group by clause, the tuples are grouped based on the similarity between the attribute values of tuples.
+6. Group by controls the presentation of tuples(rows).
+
+ORDER BY
+1. Whereas Order by statement sort the result-set either in ascending or descending order.
+2. While it does not use in CREATE VIEW statement.
+3. While in the select statement, it is always used after the group by keyword.
+4. Whereas in order by statement, the attribute can be under aggregate function.
+5. Whereas in order by clause, the result set is sorted based on ascending or descending order.
+6. While order by clause controls the presentation of columns.
+
+ 
+LAB EXERCISES: 
+ 
+ Lab 1: Group employees by department and count the number of employees in each 
+department using GROUP BY. 
+Ans.
+mysql> select depart_id, count(*) as employees_count
+    -> from employees
+    -> group by depart_id;
++-----------+-----------------+
+| depart_id | employees_count |
++-----------+-----------------+
+|       101 |               2 |
+|       102 |               1 |
+|       103 |               1 |
++-----------+-----------------+
+3 rows in set (0.00 sec)
+
+ Lab 2: Use the AVG aggregate function to find the average salary of employees in each 
+department.
+Ans.
+mysql> select depart_id, avg(salary) as avgerage_salary
+    -> from employees
+    -> group by depart_id;
++-----------+-----------------+
+| depart_id | avgerage_salary |
++-----------+-----------------+
+|       101 |    30000.000000 |
+|       102 |    12000.000000 |
+|       103 |    25000.000000 |
++-----------+-----------------+
+3 rows in set (0.00 sec)
+
+13. SQL Stored Procedure  
+ 
+Theory Questions: 
+ 
+1. What is a stored procedure in SQL, and how does it differ from a standard SQL query? 
+Ans.SQL Stored Procedures are a powerful feature in database management systems (DBMS) that allow developers to encapsulate SQL code 
+and business logic. Stored procedures are precompiled SQL statements that are stored in the database and can be executed as a single unit.
+A SQL Stored Procedure is a collection of SQL statements bundled together to perform a specific task. These procedures are stored 
+in the database and can be called upon by users, applications, or other procedures. Stored procedures are essential for automating database 
+tasks, improving efficiency, and reducing redundancy. By encapsulating logic within stored procedures, developers can streamline their 
+workflow and enforce consistent business rules across multiple applications and systems.
+
+Syntax:
+
+CREATE PROCEDURE procedure_name
+(parameter1 data_type, parameter2 data_type, …)
+AS
+BEGIN
+   — SQL statements to be executed
+END
+
+Key Terms
+CREATE PROCEDURE: This keyword creates the stored procedure with the given name.
+@parameter1, @parameter2: These are input parameters that allow you to pass values into the stored procedure.
+BEGIN...END: These keywords define the block of SQL statements that make up the procedure body.
+
+Differences Between a Stored Procedure and a Standard SQL Query
+Execution: A stored procedure is executed using commands like EXEC or CALL, while a standard SQL query is written and run directly.
+Performance: Stored procedures are precompiled, making them faster for repeated execution, whereas SQL queries are compiled every time they run.
+Reusability: Stored procedures can be reused multiple times without rewriting the SQL, unlike standard queries, 
+which need to be rewritten or copied.
+Security: Stored procedures can restrict direct access to tables and enforce access controls, while standard queries expose tables directly.
+Parameterization: Stored procedures can accept parameters for dynamic execution, whereas standard queries require 
+Transaction Handling: Stored procedures support complex transactions with multiple SQL statements, while standard 
+queries usually execute one operation at a time.
+
+2. Explain the advantages of using stored procedures. 
+Ans.
+Advantages of Using Stored Procedures in SQL
+1. Improved Performance
+Stored procedures are precompiled and optimized by the database engine.
+Unlike standard queries, which are compiled every time they run, stored procedures execute faster, especially for repetitive tasks.
+2. Code Reusability and Maintainability
+Once created, a stored procedure can be reused multiple times without rewriting SQL queries.
+If a change is needed, it can be updated in one place rather than modifying multiple queries across the application.
+3. Enhanced Security
+Stored procedures can restrict direct access to database tables.
+Users can be granted permission to execute a stored procedure without needing direct table access, reducing security risks.
+4. Reduced Network Traffic
+Since stored procedures execute directly on the database server, only the execution command (EXEC ProcedureName) is sent from the application,
+reducing network load.
+In contrast, sending raw SQL queries each time increases network traffic.
+5. Encapsulation of Business Logic
+Complex logic, such as calculations, validations, and data transformations, can be implemented inside stored procedures.
+This centralizes business rules within the database instead of scattering them across the application code.
+6. Better Transaction Management
+Stored procedures can handle multiple SQL statements as a single unit, ensuring data integrity.
+They support BEGIN TRANSACTION, COMMIT, and ROLLBACK, allowing proper error handling and rollback in case of failure.
+7. Parameterization and Dynamic Execution
+Stored procedures support input and output parameters, making them flexible and dynamic.
+Example: Instead of writing separate queries for different departments, a stored procedure can accept a department name 
+as a parameter and return relevant data.
+8. Avoids SQL Injection Attacks
+Using parameterized stored procedures helps prevent SQL injection since user inputs are treated as parameters rather than part of the SQL query. 
+
+LAB EXERCISES: 
+ 
+ Lab 1: Write a stored procedure to retrieve all employees from the employees table based 
+on department. 
+mysql> delimiter //
+mysql> CREATE PROCEDURE getempbydepartment()
+    -> begin
+    -> SELECT e.emp_id, e.employee_name, e.salary, d.department_name
+    -> FROM Employees e
+    -> JOIN departments d ON e.depart_id = d.depart_id
+    -> WHERE d.depart_id =e.depart_id ;
+    -> end
+    -> //
+Query OK, 0 rows affected (0.17 sec)
+
+mysql> delimiter ;
+mysql> call getempbydepartment();
++--------+---------------+----------+-----------------+
+| emp_id | employee_name | salary   | department_name |
++--------+---------------+----------+-----------------+
+|    201 | Ayansh        | 34000.00 | HR              |
+|    202 | Rahul         | 25000.00 | Marketing       |
+|    203 | Prachi        | 12000.00 | Sales           |
+|    204 | Naitika       | 26000.00 | HR              |
++--------+---------------+----------+-----------------+
+4 rows in set (0.00 sec)
+
+Query OK, 0 rows affected (0.02 sec)
+
+mysql>
+
+second process by deparments
+
+mysql> delimiter //
+mysql> CREATE PROCEDURE getempbydepart (IN dept_name VARCHAR(50))
+    -> begin
+    -> SELECT e.emp_id, e.employee_name, e.salary, d.department_name
+    -> FROM Employees e
+    -> JOIN departments d ON e.depart_id = d.depart_id
+    -> WHERE d.department_name = dept_name;
+    -> end
+    -> //
+Query OK, 0 rows affected (0.09 sec)
+
+mysql> delimiter ;
+mysql> call getempbydepart('HR');
++--------+---------------+----------+-----------------+
+| emp_id | employee_name | salary   | department_name |
++--------+---------------+----------+-----------------+
+|    201 | Ayansh        | 34000.00 | HR              |
+|    204 | Naitika       | 26000.00 | HR              |
++--------+---------------+----------+-----------------+
+2 rows in set (0.00 sec)
+
+Query OK, 0 rows affected (0.02 sec)
+
+ Lab 2: Write a stored procedure that accepts course_id as input and returns the course 
+details.
+ans.
+mysql> delimiter //
+mysql> create procedure getcoursedetails (in input_course_id int)
+    -> begin
+    -> select course_id, course_name, course_duration
+    -> from courses
+    -> where course_id = input_course_id;
+    -> end
+    -> //
+Query OK, 0 rows affected (0.81 sec)
+
+mysql> delimiter ;
+
+mysql> call  getcoursedetails(1001);
++-----------+-------------+-----------------+
+| course_id | course_name | course_duration |
++-----------+-------------+-----------------+
+|      1001 | PHP         | 4 Months        |
++-----------+-------------+-----------------+
+1 row in set (0.00 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+15. SQL Triggers  
+ 
+Theory Questions: 
+ 
+1. What is a trigger in SQL? Describe its types and when they are used.
+Ans. A trigger in SQL is a special type of stored procedure that automatically executes in response to certain events
+on a specified table or view. Triggers are used to enforce business rules, maintain data integrity,
+and automate database tasks.
+For example, if a company wants to automatically log changes whenever an employee's salary is updated,
+a trigger can be created on the Employees table to insert records into an AuditLog table whenever the salary column changes.
+Types of Triggers in SQL
+1. Based on Execution Time:
+Triggers are classified based on when they execute in relation to the triggering event (INSERT, UPDATE, DELETE).
+a) BEFORE Trigger
+Executes before the actual operation (INSERT, UPDATE, DELETE).
+Commonly used for validation and data modification before inserting or updating records.
+Example Use Case: Prevent inserting employees with a salary lower than the minimum wage.
+
+b) AFTER Trigger
+Executes after the actual operation has been performed.
+Often used for logging, auditing, or updating related tables.
+Example Use Case: Log changes whenever an employee's details are updated.
+
+2. Based on Event Type:
+Triggers are also classified based on the event that activates them.
+a) INSERT Trigger
+Fires when a new row is added to a table.
+Used to enforce business rules on data insertion.
+Exmple Use Case: Automatically generate a unique employee code when a new employee is inserted.
+
+b) UPDATE Trigger
+Fires when an existing row is modified.
+Used to track or validate changes to data.
+Example Use Case: Log old and new salary details whenever an employee's salary is updated.
+
+c) DELETE Trigger
+Fires when a row is deleted from a table.
+Used to prevent accidental deletions or maintain historical records.
+Example Use Case: Move deleted customer records to an archive table instead of deleting them permanently.
+
+When to Use Triggers?
+1. Maintaining Data Integrity → Enforce business rules like preventing negative values in salary fields.
+2. Auditing and Logging → Track changes in critical tables (e.g., storing old values before an update).
+3. Automating Tasks → Auto-updating related records when a primary table is modified.
+4. Restricting Actions → Prevent specific changes (e.g., blocking deletion of admin users).
+
+2. Explain the difference between INSERT, UPDATE, and DELETE triggers. 
+Ans.
+Difference Between INSERT, UPDATE, and DELETE Triggers in SQL
+1. INSERT Trigger
+Fires when a new row is added to a table.
+Used to validate data, generate unique values, or log insert operations.
+Example: When a new employee is added, automatically insert a record into an audit log.
+
+2. UPDATE Trigger
+Fires when an existing row is modified.
+Used to track changes, prevent unauthorized updates, or update related records.
+Example: When an employee's salary is updated, store the old and new salary in an audit table.
+
+3. DELETE Trigger
+Fires when a row is deleted from a table.
+Used to prevent accidental deletions, archive data, or maintain logs.
+Example: When a customer record is deleted, move it to an archive table instead of permanent deletion.
+
+LAB EXERCISES: 
+ 
+ Lab 1: Create a trigger to automatically log changes to the employees table when a new 
+employee is added. 
+Ans.
+mysql> CREATE TABLE Employee_Log (
+    ->     log_id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     emp_id INT,
+    ->     employee_name VARCHAR(50),
+    ->     action VARCHAR(20),
+    ->     log_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    -> );
+Query OK, 0 rows affected (0.41 sec)
+
+mysql> delimiter //
+mysql> create trigger aemp_insert
+    -> after insert on employees
+    -> for each row
+    -> begin
+    -> insert into employee_log(emp_id,employee_name,action)
+    -> values(new.emp_id,new.employee_name,'NEW EMPLOYEE IS ADDED');
+    -> END
+    -> //
+Query OK, 0 rows affected (0.17 sec)
+
+mysql> alter table Employee_log modify action varchar(100);
+Query OK, 0 rows affected (1.30 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> insert into employees (employee_name,salary,depart_id)values('sumit',56000,102);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> select * from Employee_log;
++--------+--------+---------------+-----------------------+---------------------+
+| log_id | emp_id | employee_name | action                | log_timestamp       |
++--------+--------+---------------+-----------------------+---------------------+
+|      1 |    206 | sumit         | NEW EMPLOYEE IS ADDED | 2025-03-27 13:15:36 |
++--------+--------+---------------+-----------------------+---------------------+
+1 row in set (0.00 sec)
+
+ Lab 2: Create a trigger to update the last_modified timestamp whenever an employee 
+record is updated.
+Ans.
+ALTER TABLE employees ADD COLUMN last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+DELIMITER //
+
+CREATE TRIGGER buemp
+BEFORE UPDATE ON employees
+FOR EACH ROW
+BEGIN
+    SET NEW.last_modified = NOW();
+END$$
+
+DELIMITER ;
+
+ select * from employees;
+ +--------+---------------+----------+-----------+---------------------+
+| emp_id | employee_name | salary   | depart_id | last_modified       |
++--------+---------------+----------+-----------+---------------------+
+|    201 | Ayansh        | 34000.00 |       101 | 2025-03-27 13:18:00 |
+|    202 | Rahul         | 25000.00 |       103 | 2025-03-27 13:18:00 |
+|    203 | Prachi        | 12000.00 |       102 | 2025-03-27 13:18:00 |
+|    204 | Naitika       | 26000.00 |       101 | 2025-03-27 13:18:00 |
+|    206 | sumit         | 56000.00 |       102 | 2025-03-27 13:18:00 |
++--------+---------------+----------+-----------+---------------------+
+5 rows in set (0.09 sec)
+
+ update employees set salary = 50000 where emp_id = 201;
+
+ mysql> select * from employees;
+   
++--------+---------------+----------+-----------+---------------------+
+| emp_id | employee_name | salary   | depart_id | last_modified       |
++--------+---------------+----------+-----------+---------------------+
+|    201 | Ayansh        | 50000.00 |       101 | 2025-03-27 13:53:47 |
+|    202 | Rahul         | 25000.00 |       103 | 2025-03-27 13:18:00 |
+|    203 | Prachi        | 12000.00 |       102 | 2025-03-27 13:18:00 |
+|    204 | Naitika       | 26000.00 |       101 | 2025-03-27 13:18:00 |
+|    206 | sumit         | 56000.00 |       102 | 2025-03-27 13:18:00 |
++--------+---------------+----------+-----------+---------------------+
+5 rows in set (0.00 sec)
+
+19. Rollback and Commit Savepoint  
+ 
+Theory Questions: 
+ 
+1. Explain the concept of SAVEPOINT in transaction management. How do ROLLBACK and 
+COMMIT interact with savepoints? 
+Ans.
+SAVEPOINT in Transaction Management
+A SAVEPOINT is a marker within a transaction that allows you to partially rollback to a specific point without rolling back the entire transaction. It helps in handling errors efficiently by preserving part of the transaction progress.
+
+Interaction with ROLLBACK and COMMIT
+ROLLBACK TO SAVEPOINT: Reverts the transaction back to a specific savepoint, keeping the previous operations intact.
+COMMIT: Finalizes all changes made in the transaction, including those after the savepoint.
+ROLLBACK (without SAVEPOINT): Undoes the entire transaction.
+
+Example (SQL)
+START TRANSACTION;
+INSERT INTO employees (name, department) VALUES ('Alice', 'HR');
+SAVEPOINT sp1;
+INSERT INTO employees (name, department) VALUES ('Bob', 'Finance');
+ROLLBACK TO sp1; -- Undoes Bob's insertion but keeps Alice's
+COMMIT; -- Saves Alice's insertion permanently
+
+2. When is it useful to use savepoints in a database transaction? 
+Ans.
+SAVEPOINTs are useful in scenarios where you need partial rollbacks within a transaction. Here are some key use cases:
+Error Handling & Recovery
+If part of a transaction fails, you can roll back to a specific savepoint instead of undoing the entire transaction.
+Example: Inserting multiple records, but one violates a constraint—rollback only that part.
+Complex Transactions
+When performing multiple dependent operations, SAVEPOINTs allow you to test intermediate results and roll back selectively if needed.
+Conditional Rollbacks
+If certain conditions aren’t met (e.g., insufficient funds in a banking system), rollback only part of 
+the transaction while keeping valid changes.
+Performance Optimization
+Instead of restarting an entire transaction due to an error, rolling back to a savepoint saves time and resources.
+Nested Transactions Simulation
+Since many databases don’t support true nested transactions, SAVEPOINTs help simulate them by rolling back 
+sub-transactions within a larger transaction.
+
+Example Scenario (Bank Transfer)
+
+START TRANSACTION;
+UPDATE accounts SET balance = balance - 500 WHERE account_id = 1;
+SAVEPOINT sp1;
+UPDATE accounts SET balance = balance + 500 WHERE account_id = 2;
+-- If second update fails (e.g., account doesn't exist)
+ROLLBACK TO sp1;
+COMMIT;
+ 
+LAB EXERCISES: 
+ 
+ Lab 1: Perform a transaction where you create a savepoint, insert records, then rollback to 
+the savepoint. 
+Ans.
+mysql> start transaction;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SAVEPOINT before_insert;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> insert into bankaccounts(account_number,funds) values (4525989,50000);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> ROLLBACK TO SAVEPOINT before_insert;
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
+
+ Lab 2: Commit part of a transaction after using a savepoint and then rollback the remaining changes. 
+mysql> START TRANSACTION;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO bankaccounts(account_number, funds) VALUES (4525989, 50000);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO bankaccounts(account_number, funds) VALUES (6823445, 55000);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SAVEPOINT b_third_insert;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO bankaccounts(account_number, funds) VALUES (8542356, 45000);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> ROLLBACK TO SAVEPOINT b_third_insert;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> commit;
+Query OK, 0 rows affected (0.13 sec)
+
+mysql> select * from bankaccounts;
++----+----------------+----------+
+| id | account_number | funds    |
++----+----------------+----------+
+| 11 | 4525989        | 50000.00 |
+| 12 | 6823445        | 55000.00 |
++----+----------------+----------+
+2 rows in set (0.00 sec)
+
+ 
+1. Introduction to SQL  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Create a database called library_db and a table books with columns: book_id, 
+title, author, publisher, year_of_publication, and price. Insert five records into 
+the table.
+Ans. CREATE DATABASE library_db;
+USE library_db;
+CREATE TABLE books (
+    book_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255) NOT NULL,
+    publisher VARCHAR(255),
+    year_of_publication INT,
+    price DECIMAL(10,2)
+);
+INSERT INTO books (title, author, publisher, year_of_publication, price) VALUES
+('The Great Gatsby', 'F. Scott Fitzgerald', 'Scribner', 1925, 10.99),
+('To Kill a Mockingbird', 'Harper Lee', 'J.B. Lippincott & Co.', 1960, 7.99),
+('1984', 'George Orwell', 'Secker & Warburg', 1949, 8.99),
+('Moby-Dick', 'Herman Melville', 'Harper & Brothers', 1851, 12.50),
+('Pride and Prejudice', 'Jane Austen', 'T. Egerton', 1813, 9.75);
+ 
+ Lab 4: Create a table members in library_db with columns: member_id, member_name, 
+date_of_membership, and email. Insert five records into this table.
+Ans.
+CREATE TABLE members (
+    member_id INT AUTO_INCREMENT PRIMARY KEY,
+    member_name VARCHAR(100) NOT NULL,
+    date_of_membership DATE NOT NULL,
+    email VARCHAR(255) UNIQUE
+);
+mysql> INSERT INTO members (member_name, date_of_membership, email) VALUES
+    -> ('Ayansh','2023-05-15','ayansh@gmail.com'),
+    -> ('Rohan','2024-11-21','rohan@gmail.com'),
+    -> ('Naitika','2021-12-25','naitika@gmail.com'),
+    -> ('ronak','2014-05-06','ronak@gmail.com'),
+    -> ('ram','2016-08-16','ram@gmail.com');
+Query OK, 5 rows affected (0.10 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+2. SQL Syntax  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Retrieve all members who joined the library before 2022. Use appropriate SQL syntax 
+with WHERE and ORDER BY. 
+Ans.
+mysql> select member_name,date_of_membership from members where date_of_membership < '2022-01-01' order by date_of_membership ASC;
++-------------+--------------------+
+| member_name | date_of_membership |
++-------------+--------------------+
+| ronak       | 2014-05-06         |
+| ram         | 2016-08-16         |
+| Naitika     | 2021-12-25         |
++-------------+--------------------+
+3 rows in set (0.06 sec)
+
+ Lab 4: Write SQL queries to display the titles of books published by a specific author. Sort the 
+results by year_of_publication in descending order.
+Ans.
+mysql> SELECT title, year_of_publication
+    -> FROM books
+    -> WHERE author = 'R.K. Narayan'
+    -> ORDER BY year_of_publication DESC;
++-----------+---------------------+
+| title     | year_of_publication |
++-----------+---------------------+
+| The Guide |                1958 |
++-----------+---------------------+
+1 row in set (0.00 sec)
+
+3. SQL Constraints  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Add a CHECK constraint to ensure that the price of books in the books table is 
+greater than 0. 
+Ans.
+mysql> ALTER TABLE books
+    -> ADD CONSTRAINT chk_price CHECK (price > 0);
+Query OK, 5 rows affected (1.06 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO books (title, author, publisher, year_of_publication, price)
+    -> VALUES ('Invalid Book', 'Author Name', 'Publisher', 2024, 0);
+ERROR 3819 (HY000): Check constraint 'chk_price' is violated.
+
+ Lab 4: Modify the members table to add a UNIQUE constraint on the email column, 
+ensuring that each member has a unique email address.
+Ans.
+mysql> alter table members add constraint unique_email unique (email);
+Query OK, 0 rows affected, 1 warning (0.75 sec)
+Records: 0  Duplicates: 0  Warnings: 1
+
+mysql> desc members;
++--------------------+--------------+------+-----+---------+----------------+
+| Field              | Type         | Null | Key | Default | Extra          |
++--------------------+--------------+------+-----+---------+----------------+
+| member_id          | int          | NO   | PRI | NULL    | auto_increment |
+| member_name        | varchar(100) | NO   |     | NULL    |                |
+| date_of_membership | date         | NO   |     | NULL    |                |
+| email              | varchar(255) | YES  | UNI | NULL    |                |
++--------------------+--------------+------+-----+---------+----------------+
+4 rows in set (0.01 sec)
+
+mysql> select * from members;
++-----------+-------------+--------------------+-------------------+
+| member_id | member_name | date_of_membership | email             |
++-----------+-------------+--------------------+-------------------+
+|         1 | Ayansh      | 2023-05-15         | ayansh@gmail.com  |
+|         2 | Rohan       | 2024-11-21         | rohan@gmail.com   |
+|         3 | Naitika     | 2021-12-25         | naitika@gmail.com |
+|         4 | ronak       | 2014-05-06         | ronak@gmail.com   |
+|         5 | ram         | 2016-08-16         | ram@gmail.com     |
++-----------+-------------+--------------------+-------------------+
+5 rows in set (0.00 sec)
+
+mysql> insert into members values('6','Mehul','2018-07-19','ram@gmail.com');
+ERROR 1062 (23000): Duplicate entry 'ram@gmail.com' for key 'members.email'
+mysql> select * from members;
++-----------+-------------+--------------------+-------------------+
+| member_id | member_name | date_of_membership | email             |
++-----------+-------------+--------------------+-------------------+
+|         1 | Ayansh      | 2023-05-15         | ayansh@gmail.com  |
+|         2 | Rohan       | 2024-11-21         | rohan@gmail.com   |
+|         3 | Naitika     | 2021-12-25         | naitika@gmail.com |
+|         4 | ronak       | 2014-05-06         | ronak@gmail.com   |
+|         5 | ram         | 2016-08-16         | ram@gmail.com     |
++-----------+-------------+--------------------+-------------------+
+5 rows in set (0.00 sec)
+
+We can also use modify for example,
+ALTER TABLE members MODIFY COLUMN email VARCHAR(255) NOT NULL UNIQUE;
+
+4. Main SQL Commands and Sub-commands (DDL)  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Create a table authors with the following columns: author_id, first_name, 
+last_name, and country. Set author_id as the primary key. 
+Ans.
+mysql> create table authors (author_id int primary key auto_increment, first_name varchar(50), last_name varchar(50),country varchar(50));
+Query OK, 0 rows affected (0.43 sec)
+
+mysql> desc authors;
++------------+-------------+------+-----+---------+----------------+
+| Field      | Type        | Null | Key | Default | Extra          |
++------------+-------------+------+-----+---------+----------------+
+| author_id  | int         | NO   | PRI | NULL    | auto_increment |
+| first_name | varchar(50) | YES  |     | NULL    |                |
+| last_name  | varchar(50) | YES  |     | NULL    |                |
+| country    | varchar(50) | YES  |     | NULL    |                |
++------------+-------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+
+ Lab 4: Create a table publishers with columns: publisher_id, publisher_name, 
+contact_number, and address. Set publisher_id as the primary key and 
+contact_number as unique.
+Ans.
+mysql> create table publishers (publisher_id int primary key auto_increment, publisher_name varchar(50), contact_number int not null unique, address varchar(100));
+Query OK, 0 rows affected (0.49 sec)
+
+mysql> desc publishers;
++----------------+--------------+------+-----+---------+----------------+
+| Field          | Type         | Null | Key | Default | Extra          |
++----------------+--------------+------+-----+---------+----------------+
+| publisher_id   | int          | NO   | PRI | NULL    | auto_increment |
+| publisher_name | varchar(50)  | YES  |     | NULL    |                |
+| contact_number | int          | NO   | UNI | NULL    |                |
+| address        | varchar(50)  | YES  |     | NULL    |                |
++----------------+--------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+5. ALTER Command  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Add a new column genre to the books table. Update the genre for all existing 
+records. 
+Ans.
+mysql> alter table books add column genre varchar(50);
+Query OK, 0 rows affected (0.32 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc books;
++---------------------+---------------+------+-----+---------+----------------+
+| Field               | Type          | Null | Key | Default | Extra          |
++---------------------+---------------+------+-----+---------+----------------+
+| book_id             | int           | NO   | PRI | NULL    | auto_increment |
+| title               | varchar(255)  | NO   |     | NULL    |                |
+| author              | varchar(255)  | NO   |     | NULL    |                |
+| publisher           | varchar(255)  | YES  |     | NULL    |                |
+| year_of_publication | int           | YES  |     | NULL    |                |
+| price               | decimal(10,2) | YES  |     | NULL    |                |
+| genre               | varchar(50)   | YES  |     | NULL    |                |
++---------------------+---------------+------+-----+---------+----------------+
+7 rows in set (0.00 sec)
+
+mysql> select * from books;
++---------+-------------------------+------------------------+-----------------------------+---------------------+-------+-------+
+| book_id | title                   | author                 | publisher                   | year_of_publication | price | genre |
++---------+-------------------------+------------------------+-----------------------------+---------------------+-------+-------+
+|       1 | The Guide               | R.K. Narayan           | Indian Thought Publications |                1958 | 15.99 | NULL  |
+|       2 | Midnight?s Children     | Salman Rushdie         | Jonathan Cape               |                1981 | 12.50 | NULL  |
+|       3 | Train to Pakistan       | Khushwant Singh        | Chatto & Windus             |                1956 | 10.99 | NULL  |
+|       4 | The God of Small Things | Arundhati Roy          | IndiaInk                    |                1997 |  9.99 | NULL  |
+|       5 | Wings of Fire           | Dr. A.P.J. Abdul Kalam | Universities Press          |                1999 |  8.50 | NULL  |
++---------+-------------------------+------------------------+-----------------------------+---------------------+-------+-------+
+5 rows in set (0.00 sec)
+
+mysql> update books set genre = 'Fiction' where book_id = 1;
+Query OK, 1 row affected (0.08 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update books set genre = 'Historical Fiction' where book_id = 2;
+Query OK, 1 row affected (0.16 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update books set genre = 'Historical Fiction' where book_id = 3;
+Query OK, 1 row affected (0.10 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update books set genre = 'Literary Fiction' where book_id = 4;
+Query OK, 1 row affected (0.08 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update books set genre = 'Autobiography' where book_id = 5;
+Query OK, 1 row affected (0.10 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from books;
++---------+-------------------------+------------------------+-----------------------------+---------------------+-------+--------------------+
+| book_id | title                   | author                 | publisher                   | year_of_publication | price | genre              |
++---------+-------------------------+------------------------+-----------------------------+---------------------+-------+--------------------+
+|       1 | The Guide               | R.K. Narayan           | Indian Thought Publications |                1958 | 15.99 | Fiction            |
+|       2 | Midnight?s Children     | Salman Rushdie         | Jonathan Cape               |                1981 | 12.50 | Historical Fiction |
+|       3 | Train to Pakistan       | Khushwant Singh        | Chatto & Windus             |                1956 | 10.99 | Historical Fiction |
+|       4 | The God of Small Things | Arundhati Roy          | IndiaInk                    |                1997 |  9.99 | Literary Fiction   |
+|       5 | Wings of Fire           | Dr. A.P.J. Abdul Kalam | Universities Press          |                1999 |  8.50 | Autobiography      |
++---------+-------------------------+------------------------+-----------------------------+---------------------+-------+--------------------+
+5 rows in set (0.00 sec)
+
+
+ Lab 4: Modify the members table to increase the length of the email column to 100 
+characters. 
+Ans.
+mysql> alter table members modify email varchar(100);
+Query OK, 5 rows affected (1.52 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> desc members;
++--------------------+--------------+------+-----+---------+----------------+
+| Field              | Type         | Null | Key | Default | Extra          |
++--------------------+--------------+------+-----+---------+----------------+
+| member_id          | int          | NO   | PRI | NULL    | auto_increment |
+| member_name        | varchar(100) | NO   |     | NULL    |                |
+| date_of_membership | date         | NO   |     | NULL    |                |
+| email              | varchar(100) | YES  | UNI | NULL    |                |
++--------------------+--------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+ 
+6. DROP Command  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Drop the publishers table from the database after verifying its structure. 
+Ans.
+mysql> desc publishers;
++----------------+--------------+------+-----+---------+----------------+
+| Field          | Type         | Null | Key | Default | Extra          |
++----------------+--------------+------+-----+---------+----------------+
+| publisher_id   | int          | NO   | PRI | NULL    | auto_increment |
+| publisher_name | varchar(50)  | YES  |     | NULL    |                |
+| contact_number | int          | NO   | UNI | NULL    |                |
+| address        | varchar(100) | YES  |     | NULL    |                |
++----------------+--------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> drop table publishers;
+Query OK, 0 rows affected (0.27 sec)
+
+ Lab 4: Create a backup of the members table and then drop the original members table. 
+Ans.
+mysql> CREATE TABLE members_backup AS SELECT * FROM members;
+Query OK, 5 rows affected (0.78 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM members_backup;
++-----------+-------------+--------------------+-------------------+
+| member_id | member_name | date_of_membership | email             |
++-----------+-------------+--------------------+-------------------+
+|         1 | Ayansh      | 2023-05-15         | ayansh@gmail.com  |
+|         2 | Rohan       | 2024-11-21         | rohan@gmail.com   |
+|         3 | Naitika     | 2021-12-25         | naitika@gmail.com |
+|         4 | ronak       | 2014-05-06         | ronak@gmail.com   |
+|         5 | ram         | 2016-08-16         | ram@gmail.com     |
++-----------+-------------+--------------------+-------------------+
+5 rows in set (0.00 sec)
+
+mysql> DROP TABLE members;
+Query OK, 0 rows affected (0.26 sec)
+
+mysql> SHOW TABLES;
++----------------------+
+| Tables_in_library_db |
++----------------------+
+| authors              |
+| books                |
+| members_backup       |
++----------------------+
+3 rows in set (0.00 sec)
+ 
+7. Data Manipulation Language (DML)  
+ 
+LAB EXERCISES: 
+ 
+ Lab 4: Insert three new authors into the authors table, then update the last name of one of 
+the authors. 
+mysql> insert into authors (author_id, first_name, last_name, country)values
+    -> (1,'Ram','Narayan','India'),
+    -> (2,'Mark','Twain','USA'),
+    -> (3,'Salman','khan','India/United Kingdom');
+Query OK, 3 rows affected (0.13 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> update authors set last_name = 'Rushdie' where author_id = 3;
+Query OK, 1 row affected (0.11 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+ Lab 5: Delete a book from the books table where the price is higher than $100. 
+ Ans.
+ mysql> delete from books where price > 100;
+Query OK, 1 row affected (0.09 sec)
+
+ 
+8. UPDATE Command  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Update the year_of_publication of a book with a specific book_id. 
+Ans.
+mysql> update books set year_of_publication = 2000 where book_id = 4;
+Query OK, 1 row affected (0.08 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+
+ Lab 4: Increase the price of all books published before 2015 by 10%. 
+ Ans.
+ mysql> update books set price = price * 1.10 where year_of_publication < 2015;
+Query OK, 3 rows affected, 3 warnings (0.10 sec)
+Rows matched: 3  Changed: 3  Warnings: 3
+ 
+9. DELETE Command  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Remove all members who joined before 2020 from the members table. 
+Ans. mysql> delete from members_backup where date_of_membership < '2020-01-01';
+Query OK, 2 rows affected (0.09 sec)
+
+ Lab 4: Delete all books that have a NULL value in the author column. 
+ Ans.
+ delete from books where author is null;
+ Query OK, 1 row affected (0.08 sec)
+
+10. Data Query Language (DQL)  
+ 
+LAB EXERCISES: 
+ 
+ Lab 4: Write a query to retrieve all books with price between $50 and $100. 
+Ans.
+mysql> select * from books where (price between 50 and 100);
++---------+-------------------------+---------------+-----------+---------------------+--------+------------------+
+| book_id | title                   | author        | publisher | year_of_publication | price  | genre            |
++---------+-------------------------+---------------+-----------+---------------------+--------+------------------+
+|       4 | The God of Small Things | Arundhati Roy | IndiaInk  |                2016 | 100.00 | Literary Fiction |
++---------+-------------------------+---------------+-----------+---------------------+--------+------------------+
+1 row in set (0.00 sec)
+
+Lab 5: Retrieve the list of books sorted by author in ascending order and limit the results 
+to the top 3 entries.
+mysql> select title from books order by author ASC limit 3;
++-------------------------+
+| title                   |
++-------------------------+
+| The God of Small Things |
+| Train to Pakistan       |
+| The Guide               |
++-------------------------+
+3 rows in set (0.00 sec)
+
+13. Transaction Control Language (TCL)  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Use COMMIT after inserting multiple records into the books table, then make another 
+insertion and perform a ROLLBACK. 
+Ans.
+mysql> START TRANSACTION;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO books VALUES
+    -> (5, 'Final stage', 'R.K. Narayan', 'indiaink', 2015, 50.5, 'Fiction'),
+    -> (6, 'Prakriti', 'Sanjay Bachhav', 'Indian publisher', 2024, 150, 'Crime');
+Query OK, 2 rows affected (0.00 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> COMMIT; 
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> START TRANSACTION; 
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> INSERT INTO books VALUES
+    -> (7, 'stage', 'R.K. Narayan', 'indiaink', 2025, 200, 'Crime');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> ROLLBACK;
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> select * from books;
++---------+-------------------------+-----------------+-----------------------------+---------------------+--------+--------------------+
+| book_id | title                   | author          | publisher                   | year_of_publication | price  | genre              |
++---------+-------------------------+-----------------+-----------------------------+---------------------+--------+--------------------+
+|       1 | The Guide               | R.K. Narayan    | Indian Thought Publications |                1958 |  19.35 | Fiction            |
+|       2 | Midnight?s Children     | Salman Rushdie  | Jonathan Cape               |                1981 |  15.13 | Historical Fiction |
+|       3 | Train to Pakistan       | Khushwant Singh | Chatto & Windus             |                1956 |  13.30 | Historical Fiction |
+|       4 | The God of Small Things | Arundhati Roy   | IndiaInk                    |                2016 | 100.00 | Literary Fiction   |
+|       5 | Final stage             | R.K. Narayan    | indiaink                    |                2015 |  50.50 | Fiction            |
+|       6 | Prakriti                | Sanjay Bachhav  | Indian publisher            |                2024 | 150.00 | Crime              |
++---------+-------------------------+-----------------+-----------------------------+---------------------+--------+--------------------+
+6 rows in set (0.00 sec)
+
+
+ Lab 4: Set a SAVEPOINT before making updates to the members table, perform some 
+updates, and then roll back to the SAVEPOINT. 
+ Ans.
+ mysql> start transaction;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> savepoint before_update;
+Query OK, 0 rows affected (0.00 sec)
+
+
+mysql> select * from members_backup;
++-----------+-------------+--------------------+-------------------+
+| member_id | member_name | date_of_membership | email             |
++-----------+-------------+--------------------+-------------------+
+|         1 | Ayansh      | 2023-05-15         | ayansh@gmail.com  |
+|         2 | Rohan       | 2024-11-21         | rohan@gmail.com   |
+|         3 | Naitika     | 2021-12-25         | naitika@gmail.com |
++-----------+-------------+--------------------+-------------------+
+3 rows in set (0.00 sec)
+
+
+mysql> update members_backup set date_of_membership = '2018-11-26' where member_id = 3;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> rollback to savepoint before_update;
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
+ 
+14. SQL Joins  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Perform an INNER JOIN between books and authors tables to display the title 
+of books and their respective authors' names.
+Ans.
+mysql> select books.title, authors.first_name, authors.last_name from books inner join authors on
+    ->  books.author_id = authors.author_id;
++---------------------+------------+-----------+
+| title               | first_name | last_name |
++---------------------+------------+-----------+
+| The Guide           | Ram        | Narayan   |
+| Midnight?s Children | Salman     | Rushdie   |
+| Final stage         | Ram        | Narayan   |
++---------------------+------------+-----------+
+3 rows in set (0.00 sec) 
+
+ Lab 4: Use a FULL OUTER JOIN to retrieve all records from the books and authors 
+tables, including those with no matching entries in the other table. 
+
+mysql> select books.book_id, books.title, books.author, books.publisher, books.year_of_publication, books. price, books.genre, authors.author_id, authors.first_name, authors.last_name, authors_country from books
+    -> left join authors on books.book_id = authors.author_id
+    -> union
+    -> select books.book_id, books.title, books.author, books.publisher, books.year_of_publication, books. price, books.genre, authors.author_id, authors.first_name, authors.last_name, authors_country from books
+    -> right join authors on books.author_id = authors.author_id;
+ERROR 1054 (42S22): Unknown column 'authors_country' in 'field list'
+mysql> select books.book_id, books.title, books.author, books.publisher, books.year_of_publication, books. price, books.genre, authors.author_id, authors.first_name, authors.last_name, authors.country from books
+    -> left join authors on books.author_id = authors.author_id
+    -> union
+    -> select books.book_id, books.title, books.author, books.publisher, books.year_of_publication, books. price, books.genre, authors.author_id, authors.first_name, authors.last_name, authors.country from books
+    -> right join authors on books.author_id = authors.author_id;
++---------+-------------------------+-----------------+-----------------------------+---------------------+--------+--------------------+-----------+------------+-----------+----------------------+
+| book_id | title                   | author          | publisher                   | year_of_publication | price  | genre              | author_id | first_name | last_name | country              |
++---------+-------------------------+-----------------+-----------------------------+---------------------+--------+--------------------+-----------+------------+-----------+----------------------+
+|       1 | The Guide               | R.K. Narayan    | Indian Thought Publications |                1958 |  19.35 | Fiction            |         1 | Ram        | Narayan   | India                |
+|       2 | Midnight?s Children     | Salman Rushdie  | Jonathan Cape               |                1981 |  15.13 | Historical Fiction |         3 | Salman     | Rushdie   | India/United Kingdom |
+|       3 | Train to Pakistan       | Khushwant Singh | Chatto & Windus             |                1956 |  13.30 | Historical Fiction |      NULL | NULL       | NULL      | NULL                 |
+|       4 | The God of Small Things | Arundhati Roy   | IndiaInk                    |                2016 | 100.00 | Literary Fiction   |      NULL | NULL       | NULL      | NULL                 |
+|       5 | Final stage             | R.K. Narayan    | indiaink                    |                2015 |  50.50 | Fiction            |         1 | Ram        | Narayan   | India                |
+|       6 | Prakriti                | Sanjay Bachhav  | Indian publisher            |                2024 | 150.00 | Crime              |      NULL | NULL       | NULL      | NULL                 |
+|    NULL | NULL                    | NULL            | NULL                        |                NULL |   NULL | NULL               |         2 | Mark       | Twain     | USA                  |
++---------+-------------------------+-----------------+-----------------------------+---------------------+--------+--------------------+-----------+------------+-----------+----------------------+
+7 rows in set (0.00 sec)
+
+15. SQL Group By  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Group books by genre and display the total number of books in each genre . 
+Ans.
+mysql> select genre, count(*) as 'total_number_of_books' from books group by genre;
++--------------------+-----------------------+
+| genre              | total_number_of_books |
++--------------------+-----------------------+
+| Fiction            |                     2 |
+| Historical Fiction |                     2 |
+| Literary Fiction   |                     1 |
+| Crime              |                     1 |
++--------------------+-----------------------+
+4 rows in set (0.15 sec)
+
+ Lab 4: Group members by the year they joined and find the number of members who joined 
+each year. 
+Ans.
+mysql> SELECT YEAR(date_of_membership) AS membership_year, COUNT(*) AS total_members
+    -> FROM members_backup
+    -> GROUP BY membership_year;
++-----------------+---------------+
+| membership_year | total_members |
++-----------------+---------------+
+|            2023 |             1 |
+|            2021 |             2 |
++-----------------+---------------+
+2 rows in set (0.00 sec)
+ 
+ 
+16. SQL Stored Procedure  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Write a stored procedure to retrieve all books by a particular author.
+ Ans.
+ 
+DELIMITER //
+
+CREATE PROCEDURE get_books_by_author(IN author_name VARCHAR(255))
+BEGIN
+    SELECT title 
+    FROM books 
+    WHERE author = author_name;
+END //
+
+DELIMITER ;
+mysql> call get_books_by_author('R.K. Narayan');
++-------------+
+| title       |
++-------------+
+| The Guide   |
+| Final stage |
++-------------+
+2 rows in set (0.06 sec)
+
+Query OK, 0 rows affected (0.09 sec)
+
+ Lab 4: Write a stored procedure that takes book_id as an argument and returns the price 
+of the book. 
+ Ans.
+ mysql> DELIMITER //
+mysql>
+mysql> CREATE PROCEDURE get_book_price(IN bookID INT, OUT bookPrice DECIMAL(10,2))
+    -> BEGIN
+    ->     SELECT price INTO bookPrice FROM books WHERE book_id = bookID;
+    -> END //
+Query OK, 0 rows affected (0.13 sec)
+
+mysql>
+mysql> DELIMITER ;
+mysql> CALL get_book_price(1, @price);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> SELECT @price AS book_price;
++------------+
+| book_price |
++------------+
+|      19.35 |
++------------+
+ 
+17. SQL View  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Create a view to show only the title, author, and price of books from the books 
+table. 
+mysql> CREATE VIEW book_details AS
+    -> SELECT title, author, price
+    -> FROM books;
+Query OK, 0 rows affected (0.13 sec)
+
+mysql> SELECT * FROM book_details
+    -> ;
++-------------------------+-----------------+--------+
+| title                   | author          | price  |
++-------------------------+-----------------+--------+
+| The Guide               | R.K. Narayan    |  19.35 |
+| Midnight?s Children     | Salman Rushdie  |  15.13 |
+| Train to Pakistan       | Khushwant Singh |  13.30 |
+| The God of Small Things | Arundhati Roy   | 100.00 |
+| Final stage             | R.K. Narayan    |  50.50 |
+| Prakriti                | Sanjay Bachhav  | 150.00 |
++-------------------------+-----------------+--------+
+6 rows in set (0.00 sec)
+
+ Lab 4: Create a view to display members who joined before 2020. 
+ mysql> create view members_joined AS
+    -> select member_name from members_backup where date_of_membership < '2020-01-01';
+Query OK, 0 rows affected (0.12 sec)
+
+mysql> select * from members_joined;
++--------------+
+| member_name  |
++--------------+
+| Mukesh Godia |
++--------------+
+1 row in set (0.00 sec)
+ 
+18. SQL Trigger  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Create a trigger to automatically update the last_modified timestamp of the 
+books table whenever a record is updated. 
+Ans. 
+mysql> ALTER TABLE books
+    -> ADD COLUMN last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+Query OK, 0 rows affected (0.34 sec)
+
+Records: 0  Duplicates: 0  Warnings: 0
+mysql> create trigger last_update before update on books
+    -> for each row
+    -> set new.last_modified = now();
+    -> //
+Query OK, 0 rows affected (0.23 sec)
+
+mysql> delimiter ;
+
+
+ Lab 4: Create a trigger that inserts a log entry into a log_changes table whenever a 
+DELETE operation is performed on the books table. 
+ mysql> delimiter //
+mysql> create trigger books_bd before delete on books
+    -> for each row
+    -> insert into log_changes (book_id, title) values(old.book_id,old.title);
+    -> //
+Query OK, 0 rows affected (0.14 sec)
+
+mysql> delimiter ;
+mysql> select * from log_changes;
+Empty set (0.00 sec)
+
+mysql>  delete from books where book_id =6;
+Query OK, 1 row affected (0.13 sec)
+
+mysql> select * from log_changes;
++--------+---------+----------+---------------------+
+| log_id | book_id | title    | deleted_datetime    |
++--------+---------+----------+---------------------+
+|      1 |       6 | Prakriti | 2025-03-29 12:18:06 |
++--------+---------+----------+---------------------+
+1 row in set (0.00 sec)
+ 
+23. Rollback and Commit Savepoint  
+ 
+LAB EXERCISES: 
+ 
+ Lab 3: Perform a transaction that includes inserting a new member, setting a SAVEPOINT, 
+and rolling back to the savepoint after making updates. 
+Ans.
+mysql> start transaction;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> insert into values(5,'Kalpana Godia','2025-03-29','kalpana@yahoo.com');
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'values(5,'Kalpana Godia','2025-03-29','kalpana@yahoo.com')' at line 1
+mysql> insert into members_backup values(5,'Kalpana Godia','2025-03-29','kalpana@yahoo.com');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> savepoint after_insert;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> update members_backup set email = 'kalpanagodia@yahoo.in' where member_id = 4;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> rollback to savepoint after_insert;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> commit;
+Query OK, 0 rows affected (0.07 sec)
+
+Note( Expected Output (Without the Email Update))
+
+ Lab 4: Use COMMIT after successfully inserting multiple books into the books table, then use 
+ROLLBACK to undo a set of changes made after a savepoint.
+Ans.
+START TRANSACTION;
+
+INSERT INTO books (book_id, title, author, publisher, year_of_publication, price, genre, author_id) 
+VALUES 
+(7, 'Inferno', 'Dan Brown', 'Doubleday', 2013, 25.50, 'Thriller', 2),
+(8, 'The Alchemist', 'Paulo Coelho', 'HarperCollins', 1988, 19.99, 'Fiction', 3);
+
+COMMIT;
+
+START TRANSACTION;
+
+SAVEPOINT after_insert;
+
+-- Update book prices
+UPDATE books SET price = price + 5 WHERE book_id = 7;
+UPDATE books SET price = price + 10 WHERE book_id = 8;
+
+ROLLBACK TO SAVEPOINT after_insert;
+
+COMMIT;
+
+
+SELECT * FROM books WHERE book_id IN (7, 8);
+
+Note(Expected Output (Prices Remain Unchanged))
